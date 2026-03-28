@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Foodie Menu</title>
+
+<link rel="stylesheet" href="Common.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+/* CATEGORY FILTER */
+.category-buttons{
+  text-align:center;
+  margin-bottom:30px;
+}
+
+.category-buttons button{
+  padding:10px 20px;
+  margin:5px;
+  border:none;
+  background:#8B0000;
+  color:white;
+  cursor:pointer;
+  border-radius:5px;
+  transition:0.3s;
+}
+
+.category-buttons button:hover{
+  background:#FFD700;
+  color:black;
+}
+
+/* BADGES */
+.badge{
+  position:absolute;
+  top:10px;
+  left:10px;
+  background:#e63946;
+  color:white;
+  padding:5px 10px;
+  font-size:12px;
+  border-radius:5px;
+}
+
+.badge.popular{ background:green; }
+.badge.spicy{ background:orange; }
+.badge.new{ background:blue; }
+
+.card{
+  position:relative;
+}
+/* Center the footer text */
+    footer {
+      text-align: center;
+      padding: 20px 0;
+      background-color: #f8f8f8;
+      font-size: 16px;
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+
+<div class="logo">Foodie</div>
+
+<nav id="nav-links">
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="menu.html" class="active">Menu</a>
+<a href="order.html">Order Now</a>
+<a href="contact.html">Contact</a>
+</nav>
+
+<div class="cart-icon" onclick="openCart()">
+🛒 <span id="cart-count">0</span>
+</div>
+
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+</header>
+
+<!-- MENU SECTION -->
+<section>
+
+<h1 style="text-align:center;">Our Menu</h1>
+
+<!-- CATEGORY FILTER -->
+<div class="category-buttons">
+<button onclick="filterMenu('all')">All</button>
+<button onclick="filterMenu('starter')">Starters</button>
+<button onclick="filterMenu('main')">Main Course</button>
+<button onclick="filterMenu('dessert')">Desserts</button>
+<button onclick="filterMenu('drink')">Drinks</button>
+</div>
+
+<!-- FOOD GRID -->
+<div class="card-container" id="menu-foods"></div>
+
+</section>
+
+
+<!-- CART -->
+<div id="cart">
+
+<h2>Your Cart</h2>
+
+<ul id="cart-items"></ul>
+
+<p><strong>Total: $<span id="cart-total">0</span></strong></p>
+
+<a href="order.html" class="btn">Go to Checkout</a>
+
+<button class="btn" onclick="closeCart()">Close</button>
+
+</div>
+
+<!-- Footer -->
+  <footer>
+    <p class="footer-bottom">© 2026 Foodie Restaurant. All Rights Reserved.</p>
+  </footer>
+
+<!-- SCRIPT -->
+<script>
+
+/* FOOD DATA (UPDATED WITH CATEGORIES + BADGES) */
+
+let foods = [
+
+  /* STARTERS */
+  {
+    name:"Bruschetta",
+    price:8,
+    category:"starter",
+    badge:"new",
+    image:"https://images.unsplash.com/photo-1604908176997-125f25cc6f3d",
+    description:"Grilled bread topped with tomatoes."
+  },
+  {
+    name:"Garlic Bread",
+    price:7,
+    category:"starter",
+    badge:"popular",
+    image:"https://images.unsplash.com/photo-1608198093002-ad4e005484ec",
+    description:"Crispy bread with garlic butter."
+  },
+
+  /* MAIN COURSE */
+  {
+    name:"Grilled Chicken",
+    price:18,
+    category:"main",
+    badge:"popular",
+    image:"https://images.unsplash.com/photo-1600891964599-f61ba0e24092",
+    description:"Juicy grilled chicken with spices."
+  },
+  {
+    name:"Steak",
+    price:25,
+    category:"main",
+    badge:"popular",
+    image:"https://images.unsplash.com/photo-1551183053-bf91a1d81141",
+    description:"Perfectly cooked steak."
+  },
+  {
+    name:"Pasta",
+    price:15,
+    category:"main",
+    badge:"spicy",
+    image:"https://images.unsplash.com/photo-1525755662778-989d0524087e",
+    description:"Creamy Italian pasta."
+  },
+  {
+    name:"Burger",
+    price:12,
+    category:"main",
+    badge:"new",
+    image:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
+    description:"Juicy beef burger with cheese."
+  },
+
+  {
+    name:"Italian Pizza",
+    price:14,
+    category:"main",
+    badge:"popular",
+    image:"https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
+    description:"Wood-fired pizza topped with mozzarella and basil."
+  },
+
+  /* DESSERTS */
+  {
+    name:"Ice Cream",
+    price:6,
+    category:"dessert",
+    badge:"new",
+    image:"https://images.unsplash.com/photo-1497034825429-c343d7c6a68f",
+    description:"Delicious frozen dessert."
+  },
+  {
+    name:"Chocolate Cake",
+    price:8,
+    category:"dessert",
+    badge:"popular",
+    image:"https://images.unsplash.com/photo-1578985545062-69928b1d9587",
+    description:"Rich chocolate layered cake."
+  },
+  {
+    name:"Donuts",
+    price:5,
+    category:"dessert",
+    badge:"new",
+    image:"https://images.unsplash.com/photo-1505253758473-96b7015fcd40",
+    description:"Sweet glazed donuts."
+  },
+
+  /* DRINKS */
+  {
+    name:"Cocktail",
+    price:10,
+    category:"drink",
+    badge:"popular",
+    image:"https://images.unsplash.com/photo-1551024709-8f23befc6f87",
+    description:"Refreshing mixed drink."
+  },
+  {
+    name:"Fresh Juice",
+    price:7,
+    category:"drink",
+    badge:"new",
+    image:"https://images.unsplash.com/photo-1553530666-ba11a7da3888",
+    description:"Natural fruit juice."
+  },
+  {
+    name:"Coffee",
+    price:4,
+    category:"drink",
+    badge:"popular",
+    image:"https://images.unsplash.com/photo-1509042239860-f550ce710b93",
+    description:"Hot brewed coffee."
+  }
+
+];
+
+
+/* LOAD MENU */
+
+let container = document.getElementById("menu-foods");
+
+function displayFoods(filter){
+
+container.innerHTML="";
+
+foods.forEach(food=>{
+
+if(filter==="all" || food.category===filter){
+
+container.innerHTML += `
+<div class="card">
+
+${food.badge ? `<span class="badge ${food.badge}">${food.badge}</span>` : ""}
+
+<img src="${food.image}">
+
+<div class="card-content">
+<h3>${food.name}</h3>
+<p><strong>$${food.price}</strong></p>
+<p>${food.description}</p>
+
+<button class="btn" onclick="addToCart('${food.name}',${food.price})">
+Add to Cart
+</button>
+
+</div>
+
+</div>
+`;
+
+}
+
+});
+
+}
+
+
+/* FILTER FUNCTION */
+function filterMenu(category){
+displayFoods(category);
+}
+
+
+/* CART SYSTEM */
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function addToCart(name,price){
+
+let item = cart.find(food => food.name === name);
+
+if(item){
+item.quantity++;
+}else{
+cart.push({name,price,quantity:1});
+}
+
+updateCart();
+}
+
+function updateCart(){
+
+let cartItems=document.getElementById("cart-items");
+cartItems.innerHTML="";
+
+let total=0;
+
+cart.forEach((item,index)=>{
+
+cartItems.innerHTML += `
+<li>
+${item.name} - $${item.price}
+<br>
+Qty: ${item.quantity}
+<button onclick="increaseQty(${index})">+</button>
+<button onclick="decreaseQty(${index})">-</button>
+</li>
+`;
+
+total += item.price * item.quantity;
+
+});
+
+document.getElementById("cart-total").innerText=total;
+document.getElementById("cart-count").innerText=cart.length;
+
+localStorage.setItem("cart",JSON.stringify(cart));
+}
+
+function increaseQty(i){ cart[i].quantity++; updateCart(); }
+
+function decreaseQty(i){
+cart[i].quantity>1 ? cart[i].quantity-- : cart.splice(i,1);
+updateCart();
+}
+
+function openCart(){ document.getElementById("cart").style.right="0"; }
+function closeCart(){ document.getElementById("cart").style.right="-350px"; }
+
+function toggleMenu(){
+document.getElementById("nav-links").classList.toggle("show");
+}
+
+/* INIT */
+displayFoods("all");
+updateCart();
+
+</script>
+
+</body>
+</html>

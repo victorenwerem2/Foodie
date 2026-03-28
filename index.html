@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Foodie Restaurant</title>
+
+<link rel="stylesheet" href="Common.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">Foodie</div>
+
+<nav id="nav-links">
+<a href="index.html" class="active">Home</a>
+<a href="about.html">About</a>
+<a href="menu.html">Menu</a>
+<a href="order.html">Order Now</a>
+<a href="contact.html">Contact</a>
+</nav>
+
+<div class="cart-icon" onclick="openCart()">
+🛒 <span id="cart-count">0</span>
+</div>
+
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+</header>
+
+<section class="hero">
+
+<div class="hero-overlay">
+
+<h1>Delicious Food Delivered to Your Doorstep</h1>
+
+<p>Fresh Ingredients • Best Chefs • Fast Delivery</p>
+
+<a href="order.html" class="btn">Order Now</a>
+<a href="menu.html" class="btn">View Menu</a>
+
+</div>
+
+</section>
+
+
+<!-- Featured Dishes -->
+
+<section>
+
+<h2>Featured Dishes</h2>
+
+<div class="card-container" id="featured-dishes"></div>
+
+</section>
+
+
+<!-- Why Choose Us -->
+
+<section id="why-choose-us">
+
+<h2>Why Choose Us</h2>
+
+<div class="choose-us-cards">
+
+<div class="card">
+<i class="fa-solid fa-truck-fast choose-icon"></i>
+<h3>Fast Delivery</h3>
+<p>Get your food delivered hot and on time.</p>
+</div>
+
+<div class="card">
+<i class="fa-solid fa-leaf choose-icon"></i>
+<h3>Fresh Ingredients</h3>
+<p>We use only fresh, high-quality ingredients.</p>
+</div>
+
+<div class="card">
+<i class="fa-solid fa-user-chef choose-icon"></i>
+<h3>Best Chefs</h3>
+<p>Our chefs are experienced and passionate.</p>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- Testimonials -->
+
+<section id="testimonials">
+
+<h2>Customer Reviews</h2>
+
+<div class="testimonial-cards">
+
+<div class="testimonial-card">
+<p>"The food was amazing and arrived quickly!"</p>
+<span>- John Doe</span>
+<div class="stars">⭐⭐⭐⭐⭐</div>
+</div>
+
+<div class="testimonial-card">
+<p>"Fresh ingredients and great service!"</p>
+<span>- Mary Smith</span>
+<div class="stars">⭐⭐⭐⭐</div>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- Footer -->
+
+<footer id="footer">
+
+<div class="footer-info">
+
+<div>
+<h3>Contact Us</h3>
+<p>123 Food Street, City</p>
+<p>Phone: +1 234 567 890</p>
+<p>Email: info@foodwebsite.com</p>
+</div>
+
+<div>
+<h3>Follow Us</h3>
+<p>
+<a href="#">Facebook</a> |
+<a href="#">Instagram</a> |
+<a href="#">Twitter</a>
+</p>
+</div>
+
+<div>
+<h3>Opening Hours</h3>
+<p>Mon - Fri: 10AM - 10PM</p>
+<p>Sat - Sun: 11AM - 11PM</p>
+</div>
+
+</div>
+
+<p class="footer-bottom">© 2026 Foodie Restaurant. All Rights Reserved.</p>
+
+</footer>
+
+
+<!-- CART -->
+
+<div id="cart">
+
+<h2>Your Cart</h2>
+
+<ul id="cart-items"></ul>
+
+<p><strong>Total: $<span id="cart-total">0</span></strong></p>
+
+<a href="order.html#checkout" class="btn">Checkout</a>
+
+<button class="btn" onclick="closeCart()">Close</button>
+
+</div>
+
+
+<script src="foods.js"></script>
+
+<script>
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function addToCart(name,price){
+
+let item = cart.find(food => food.name === name);
+
+if(item){
+item.quantity++;
+}
+else{
+cart.push({
+name:name,
+price:price,
+quantity:1
+});
+}
+
+updateCart();
+
+}
+
+function updateCart(){
+
+let cartItems=document.getElementById("cart-items");
+
+if(!cartItems) return;
+
+cartItems.innerHTML="";
+
+let total=0;
+
+cart.forEach((item,index)=>{
+
+let li=document.createElement("li");
+
+li.innerHTML = `
+${item.name} - $${item.price}
+<br>
+Qty: ${item.quantity}
+<button onclick="increaseQty(${index})">+</button>
+<button onclick="decreaseQty(${index})">-</button>
+`;
+
+cartItems.appendChild(li);
+
+total += item.price * item.quantity;
+
+});
+
+document.getElementById("cart-total").innerText=total;
+document.getElementById("cart-count").innerText=cart.length;
+
+/* SAVE CART */
+localStorage.setItem("cart",JSON.stringify(cart));
+
+}
+
+function increaseQty(index){
+cart[index].quantity++;
+updateCart();
+}
+
+function decreaseQty(index){
+
+if(cart[index].quantity>1){
+cart[index].quantity--;
+}
+else{
+cart.splice(index,1);
+}
+
+updateCart();
+}
+
+function openCart(){
+document.getElementById("cart").style.right="0";
+}
+
+function closeCart(){
+document.getElementById("cart").style.right="-350px";
+}
+
+function toggleMenu(){
+document.getElementById("nav-links").classList.toggle("show");
+}
+
+
+let container=document.getElementById("featured-dishes");
+
+foods.forEach(food=>{
+
+container.innerHTML +=
+
+`
+<div class="card">
+
+<img src="${food.image}">
+
+<div class="card-content">
+
+<h3>${food.name}</h3>
+
+<p><strong>$${food.price}</strong></p>
+
+<p>${food.description}</p>
+
+<button class="btn" onclick="addToCart('${food.name}',${food.price})">Add to Cart</button>
+
+</div>
+
+</div>
+`;
+
+});
+
+
+
+</script>
+
+</body>
+</html>
